@@ -18,7 +18,6 @@ class Game:
         self.speedLevel = 1
         self.counter = 0
         self.life = 3
-        self.info = f"Kalan Hakkın: {self.life} Seviye: {float(self.speedLevel):.2f}"
 
     def on_init(self):
         pygame.init()
@@ -62,14 +61,14 @@ class Game:
                              ((self.width-10)//2, frameWeight+i*50, 10, 15))
 
         if self.life == 0:
-            self.scoreText = "Oyun Bitti"
+            self.scoreText = "Oyun Bitti, yeniden başlatmak için yukarı ok tuşuna basın"
 
         if self.stop == False:
             self.counter += 1
             if self.counter == 3000:
                 self.counter = 0
                 self.speedLevel += 0.1
-                self.scoreText = self.info
+                self.scoreText = f"Kalan Hakkın: {self.life} Seviye: {float(self.speedLevel):.2f}"
 
             if self.myCarLoc.colliderect(self.otherCarLoc):
                 self.life -= 1
@@ -90,6 +89,10 @@ class Game:
             self.displaySurface.blit(self.myCar, self.myCarLoc)
             self.displaySurface.blit(self.otherCar, self.otherCarLoc)
             self.displaySurface.blit(self.player, self.playerLoc)
+            playerText = self.font.render(
+                f"Sürücü: Zeyd", False, (255, 255, 255))
+            self.displaySurface.blit(
+                playerText, (10, 100))
 
         frame = pygame.draw.rect(self.displaySurface, (39, 98, 22),
                                  (0, 0, self.width, self.height), frameWeight)
@@ -101,10 +104,6 @@ class Game:
 
         playerArea = pygame.draw.circle(self.displaySurface, (0, 0, 0),
                                         self.playerLoc.center, 50-frameWeight+2, frameWeight+2)
-        playerText = self.font.render(
-            "Sürücü Zeyd", False, (255, 255, 255))
-        self.displaySurface.blit(
-            playerText, (10, 100))
 
     def on_event(self, event):
         if event.type == pygame.QUIT:
@@ -113,9 +112,14 @@ class Game:
             if event.key == pygame.K_ESCAPE:
                 self.running = False
             elif event.key == pygame.K_UP:
-                if self.stop == True and self.life > 0:
+                if self.life == 0:
+                    self.speedLevel = 1
+                    self.life = 3
+                    self.counter = 0
                     self.stop = False
-                    self.scoreText = self.info
+                elif self.stop == True and self.life > 0:
+                    self.stop = False
+                    self.scoreText = f"Kalan Hakkın: {self.life} Seviye: {float(self.speedLevel):.2f}"
                 else:
                     self.stop = True
                     self.scoreText = f"Oyun Durduruldu"
